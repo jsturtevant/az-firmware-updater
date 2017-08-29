@@ -1,0 +1,35 @@
+{
+  "name": "az-firmware-updater",
+  "version": "0.0.6",
+  "description": "Helps simplify the work needed to control the process flow for updating firmware in node.js when using Azure IoT Hub.",
+  "main": "az-firmware-updater.js",
+  "scripts": {
+    "test": "node_modules\\\\.bin\\\\tape tests/**/*.test.js | node_modules\\\\.bin\\\\tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jsturtevant/az-firmware-updater.git"
+  },
+  "keywords": [
+    "azure",
+    "azure iot hub",
+    "iot",
+    "firmware"
+  ],
+  "author": "James Sturtevant",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jsturtevant/az-firmware-updater/issues"
+  },
+  "homepage": "https://github.com/jsturtevant/az-firmware-updater#readme",
+  "dependencies": {
+    "decompress": "^4.2.0"
+  },
+  "devDependencies": {
+    "azure-iot-device": "^1.1.17",
+    "azure-iot-device-mqtt": "^1.1.17",
+    "azure-iothub": "^1.1.15",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.8.0"
+  }
+}
