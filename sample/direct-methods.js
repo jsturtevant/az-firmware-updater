@@ -1,7 +1,5 @@
 exports.initiateUpdate = function (firmwareUpdater) {
     return function (request, response) {
-        printDeviceMethodRequest(request);
-
         const packageUrl = request.payload.firmwareUrl;
 
         if (!firmwareUpdater.isConnectionValid(packageUrl)) {
@@ -23,16 +21,6 @@ exports.initiateUpdate = function (firmwareUpdater) {
                 }
             });
         });
-    }
-}
-
-function printDeviceMethodRequest(request) {
-    // print method name
-    console.log('Received method call for method \'' + request.methodName + '\'');
-
-    // if there's a payload just do a default console log on it
-    if (request.payload) {
-        console.log('Payload:\n' + request.payload);
     }
 }
 
