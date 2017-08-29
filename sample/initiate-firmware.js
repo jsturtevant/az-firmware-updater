@@ -1,14 +1,15 @@
 const Client = require('azure-iothub').Client;
 
 const deviceId = process.argv[2];
-const connString = process.argv[3] || process.env.connectionString;
+const connString = process.argv[3] 
+const firmwareUrl = process.argv[4] 
 
 const client = Client.fromConnectionString(connString);
 
 const method = {
     methodName: "firmwareUpdate",
     payload: {
-        firmwareUrl: '<your firmware package url>'
+        firmwareUrl: firmwareUrl
     },
     timeoutInSeconds: 30
 };
