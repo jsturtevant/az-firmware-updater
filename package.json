@@ -24,6 +24,7 @@
   "homepage": "https://github.com/jsturtevant/az-firmware-updater#readme",
   "dependencies": {
     "decompress": "^4.2.0",
+    "mkdirp": "^0.5.1",
     "rimraf": "^2.6.1"
   },
   "devDependencies": {

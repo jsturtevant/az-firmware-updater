@@ -2,11 +2,24 @@ const url = require('url');
 const downloader = require('./lib/downloader');
 const HubReporter = require('./lib/hub-reporter');
 const rimraf = require('rimraf');
+const os = require('os');
+const path = require('path');
+
 
 module.exports = class FirmwareUpdater {
     constructor(client, options) {
         this.hubReporter = new HubReporter(client);
-        this.options = options;
+
+        const defaultOptions = {
+            downloadOpts: {
+                location: path.join(os.homedir(), ".azfirmware"),
+                decompress: {
+                    location: path.join(os.homedir(), ".azfirmware\\uncompressed")
+                }
+            },
+        };
+
+        this.options = Object.assign({}, defaultOptions, options);;
     }
 
     isConnectionValid(fwPackageUri = "") {
