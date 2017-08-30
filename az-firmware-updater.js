@@ -55,7 +55,8 @@ module.exports = class FirmwareUpdater {
 
         console.log("restarting...");
         const self = this;
-        this.hubReporter.sendRestartReport().then(_ => self.options.restart());
+        return this.hubReporter.sendRestartReport()
+                .then(_ => self.options.restart());
     }
 
     download(fwPackageUri) {
@@ -79,11 +80,14 @@ module.exports = class FirmwareUpdater {
             return Promise.reject('applyImage option must be function');
         }
 
-        return this.options.applyImage(fileLocation);
+        const result = this.options.applyImage(fileLocation);
+
+        if (Promise.resolve(result) == result){
+            return result;
+        }else{
+            return Promise.resolve(result);
+        }
     }
-
-    
-
 }
 
 
