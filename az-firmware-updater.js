@@ -1,6 +1,7 @@
 const url = require('url');
 const downloader = require('./lib/downloader');
-const HubReporter = require('./lib/hub-reporter')
+const HubReporter = require('./lib/hub-reporter');
+const rimraf = require('rimraf');
 
 module.exports = class FirmwareUpdater {
     constructor(client, options) {
@@ -22,10 +23,15 @@ module.exports = class FirmwareUpdater {
     initiateFirmwareUpdateFlow(fwPackageUri, callback) {
         console.log("firmware upgrade started")
 
+        let currentLocation;
         this.hubReporter.resetFirmwareReport()
             .then(_ => this.download(fwPackageUri))
-            .then(fileLocation => this.apply(fileLocation))
+            .then(fileLocation => {
+                currentLocation = fileLocation;
+                return this.apply(fileLocation);
+            })
             .then(_ => this.restart())
+            .then(_ => this.cleanup(currentLocation))
             .then(_ => {
                 // complete
                 callback();
@@ -43,12 +49,12 @@ module.exports = class FirmwareUpdater {
             });
     }
 
-    restart(){
-        if (!this.options.restart){
+    restart() {
+        if (!this.options.restart) {
             console.log('restart skipped');
             return Promise.resolve();
         }
-        
+
         if (typeof this.options.restart !== 'function') {
             return Promise.reject('restart option must be function');
         }
@@ -56,23 +62,41 @@ module.exports = class FirmwareUpdater {
         console.log("restarting...");
         const self = this;
         return this.hubReporter.sendRestartReport()
-                .then(_ => self.options.restart());
+            .then(_ => self.options.restart());
+    }
+
+    cleanup(fileLocation) {
+        if (!this.options.cleanup) {
+            console.log("cleanup skipped. you are responsible for cleaning up firmware files.")
+            return Promise.resolve();
+        }
+
+        return new Promise(function (fulfill, reject) {
+            rimraf(fileLocation, function (err) {
+                if (err) {
+                    return reject(err);
+                }
+
+                console.log("all files removed");
+                fulfill();
+            });
+        });
     }
 
     download(fwPackageUri) {
         return this.hubReporter.sendDownloadingReport()
-                .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
-                .then(fileLocation => {
-                    return this.hubReporter.sendDownloadedReport().then(_ => {
-                        return Promise.resolve(fileLocation);
-                    });
+            .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
+            .then(fileLocation => {
+                return this.hubReporter.sendDownloadedReport().then(_ => {
+                    return Promise.resolve(fileLocation);
                 });
+            });
     }
 
     apply(fileLocation) {
         return this.hubReporter.sendApplyingReport()
-                .then(_ => this.applyImage(fileLocation))
-                .then(_ => this.hubReporter.sendAppliedReport())
+            .then(_ => this.applyImage(fileLocation))
+            .then(_ => this.hubReporter.sendAppliedReport())
     }
 
     applyImage(fileLocation) {
@@ -82,9 +106,9 @@ module.exports = class FirmwareUpdater {
 
         const result = this.options.applyImage(fileLocation);
 
-        if (Promise.resolve(result) == result){
+        if (Promise.resolve(result) == result) {
             return result;
-        }else{
+        } else {
             return Promise.resolve(result);
         }
     }

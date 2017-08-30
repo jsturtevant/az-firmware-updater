@@ -1,6 +1,7 @@
 const test = require('tape');
 var td = require('testdouble');
 
+const rimraf = td.replace('rimraf');
 const FirmwareUpdater = require('../az-firmware-updater');
 
 test('az-firmware-updater-tests', function (group) {
@@ -178,7 +179,8 @@ test('az-firmware-updater-tests', function (group) {
         t.plan(2);
         
         // something wierd with Test double keeping around reporter module so scoped it here.
-        // this is probably not the best way to do this but the td.reset() wasn't working.
+        // this is probably not the best way to do this but the td.reset() wasn't working when 
+        // td.replace was called at top of file.
         const HubReporter = td.replace('../lib/hub-reporter');
         const FirmwareUpdater2 = require('../az-firmware-updater');
 
@@ -208,7 +210,8 @@ test('az-firmware-updater-tests', function (group) {
         t.plan(2);
         
         // something wierd with Test double keeping around reporter module so scoped it here.
-        // this is probably not the best way to do this but the td.reset() wasn't working.
+        // this is probably not the best way to do this but the td.reset() wasn't working when 
+        // td.replace was called at top of file.
         const HubReporter = td.replace('../lib/hub-reporter');
         const FirmwareUpdater2 = require('../az-firmware-updater');
 
@@ -232,6 +235,79 @@ test('az-firmware-updater-tests', function (group) {
             });  
         
         td.reset();
+    });
+
+    group.test('if cleanup option is false then resolve', function (t) {
+        t.plan(1);
+
+        const options = {
+            cleanup: false
+        }
+
+        const updater = new FirmwareUpdater(stubClient(), options);
+
+        updater.cleanup()
+            .then(result => {
+                td.verify(rimraf(), {times: 0, ignoreExtraArgs: true}) // passes
+                t.pass();
+            }).catch(err => {
+                t.fail('should not get here');
+            });
+    });
+
+    group.test('if cleanup option is null then resolve', function (t) {
+        t.plan(1);
+
+        const options = {
+            cleanup: null
+        }
+
+        const updater = new FirmwareUpdater(stubClient(), options);
+
+        updater.cleanup()
+            .then(result => {
+                td.verify(rimraf(), {times: 0, ignoreExtraArgs: true}) // passes
+                t.pass();
+            }).catch(err => {
+                t.fail('should not get here');
+            });
+    });
+
+    group.test('if cleanup option is passed then resolve', function (t) {
+        t.plan(1);
+
+        const options = {
+        }
+
+        const updater = new FirmwareUpdater(stubClient(), options);
+
+        updater.cleanup()
+            .then(result => {
+                td.verify(rimraf(), {times: 0, ignoreExtraArgs: true});
+                t.pass();
+            }).catch(err => {
+                t.fail('should not get here');
+            });
+    });
+
+    group.test('if cleanup option is passed then call rimraf', function (t) {
+        t.plan(1);
+
+        const options = {
+            cleanup: true
+        }
+
+        td.when(rimraf(td.matchers.anything())).thenCallback(null, Promise.resolve());
+
+        const updater = new FirmwareUpdater(stubClient(), options);
+
+        updater.cleanup('/test/file')
+            .then(result => {
+                td.verify(rimraf('/test/file', td.matchers.anything()));
+                t.pass();
+            }).catch(err => {
+                t.fail('should not get here');
+            });
     });
 
     group.end();
