@@ -98,7 +98,7 @@ module.exports = class FirmwareUpdater {
 
     download(fwPackageUri) {
         return this.hubReporter.sendDownloadingReport()
-            .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
+            .then(_ => downloader(fwPackageUri, this.options.downloadOpts))
             .then(fileLocation => {
                 return this.hubReporter.sendDownloadedReport().then(_ => {
                     return Promise.resolve(fileLocation);
