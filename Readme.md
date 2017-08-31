@@ -1,3 +1,5 @@
+![build status](https://jsturtevant.visualstudio.com/_apis/public/build/definitions/45b608fa-8cc0-476d-8c5c-999525e4924c/13/badge)
+
 # Azure IoT Firmware Updater
 Helps simplify the work needed to control the process flow for updating firmware in node.js when using Azure IoT Hub
 
