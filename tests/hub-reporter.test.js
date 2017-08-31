@@ -15,6 +15,7 @@ test('hub-reporter-tests', function (group) {
 
         reporter.reportFirmwareUpdate({}).catch(err => {
             t.equal(err, "failed to get twin");
+            t.fail();
         });
     });
 
