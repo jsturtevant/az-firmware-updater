@@ -52,3 +52,13 @@ client.open(function (err) {
 });
 ```
 
+## Options
+
+There are many options you can overload. Docs coming soon.
+
+### Getting Public Key for Cert Pinning
+
+```
+echo -n | openssl s_client -connect <your-url>:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > cert.pem
+openssl x509 -noout -in cert.pem -fingerprint
+```
